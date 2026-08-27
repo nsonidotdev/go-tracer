@@ -17,7 +17,7 @@ type Span struct {
 	duration time.Duration
 	start    time.Time
 	end      time.Time
-	meta     any
+	meta     map[string]string
 	status   status
 	reason   string
 	children []*Span

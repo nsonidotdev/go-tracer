@@ -6,7 +6,7 @@ import (
 	"github.com/nsonidotdev/go-tracer/internal/id"
 )
 
-func Start(parent *Span, name string, meta any) (*Span, error) {
+func Start(parent *Span, name string, meta map[string]string) (*Span, error) {
 	id, err := id.GenerateRandomID(10)
 	if err != nil {
 		return nil, err
