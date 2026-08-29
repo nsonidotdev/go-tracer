@@ -19,7 +19,7 @@ const (
 	downPrefix  = "│   "
 )
 
-func PrintSpan(ctx context.Context) {
+func PrintTrace(ctx context.Context) {
 	s, err := getCtxSpan(ctx)
 	if err != nil {
 		fmt.Println("error extracting span from context", err)
