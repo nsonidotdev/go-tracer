@@ -8,7 +8,7 @@ import (
 	"github.com/nsonidotdev/go-tracer/internal/id"
 )
 
-func Start(parent context.Context, name string, meta map[string]string) (context.Context, error) {
+func StartSpan(parent context.Context, name string, meta map[string]string) (context.Context, error) {
 	parentSpan, err := getCtxSpan(parent)
 	// isNewTrace := errors.Is(err, errCtxSpanNotFound)
 
