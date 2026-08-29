@@ -1,8 +1,13 @@
 package tracer
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type status string
+
+const ctxSpanKey = "span"
 
 const (
 	statusRunning status = "running"
@@ -22,4 +27,5 @@ type Span struct {
 	reason   string
 	children []*Span
 	parent   *Span
+	mu       sync.Mutex
 }

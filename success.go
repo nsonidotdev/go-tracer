@@ -1,7 +1,9 @@
 package tracer
 
-func (s *Span) Success() {
-	s.finish(finishOptions{
+import "context"
+
+func Success(ctx context.Context) {
+	finish(ctx, finishOptions{
 		Status: statusSuccess,
 	})
 }

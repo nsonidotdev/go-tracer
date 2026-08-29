@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"context"
 	"time"
 )
 
@@ -9,18 +10,24 @@ type finishOptions struct {
 	Reason string
 }
 
-func (s *Span) finish(opts finishOptions) {
+func finish(ctx context.Context, opts finishOptions) {
+	s, err := getCtxSpan(ctx)
+	if err != nil || s == nil {
+		// Context carries no span. Return early
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// TODO: catch context cancel signal (timed out or cancel call)
+	// and fail the span
+
 	if s.isFinished() {
-		// TODO: add warning log to notify that span was already finished
-		s.status = opts.Status
-		s.reason = opts.Reason
 		return
 	}
 
 	end := time.Now()
 	if s.start.IsZero() {
-		// TODO: add warning log to notify that finish was executed
-		// with unset `Start` field. This is a bug on developer side
 		s.start = time.Now()
 	}
 
@@ -30,10 +37,6 @@ func (s *Span) finish(opts finishOptions) {
 	s.duration = duration
 	s.status = opts.Status
 	s.reason = opts.Reason
-
-	if s.parent == nil {
-		// TODO: remove the span from registry
-	}
 }
 
 func (s *Span) isFinished() bool {

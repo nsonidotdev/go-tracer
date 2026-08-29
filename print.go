@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"context"
 	"fmt"
 	"strings"
 )
@@ -18,7 +19,13 @@ const (
 	downPrefix  = "│   "
 )
 
-func (s *Span) Print() {
+func PrintSpan(ctx context.Context) {
+	s, err := getCtxSpan(ctx)
+	if err != nil {
+		fmt.Println("error extracting span from context", err)
+		return
+	}
+
 	fmt.Printf("TRACE: %s\n", s.id)
 	recursivePrint(s, printOptions{isRoot: true, prefix: ""})
 }
