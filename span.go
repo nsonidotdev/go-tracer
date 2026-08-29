@@ -28,4 +28,6 @@ type Span struct {
 	children []*Span
 	parent   *Span
 	mu       sync.Mutex
+	// After func stop() callback
+	stopCancelListener func() bool
 }

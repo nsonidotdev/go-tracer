@@ -37,5 +37,10 @@ func StartSpan(parent context.Context, name string, meta map[string]string) (con
 	}
 
 	ctx := context.WithValue(parent, ctxSpanKey, newSpan)
+	stop := context.AfterFunc(ctx, func() {
+		newSpan.finish(finishOptions{status: statusFail, reason: errSpanCtxCancelled.Error()})
+	})
+	newSpan.stopCancelListener = stop
+
 	return ctx, nil
 }

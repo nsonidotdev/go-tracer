@@ -2,12 +2,6 @@ package tracer
 
 import (
 	"context"
-	"errors"
-)
-
-var (
-	errCtxSpanMistyped = errors.New("could not parse span")
-	errCtxSpanNotFound = errors.New("span not found")
 )
 
 func getCtxSpan(ctx context.Context) (*Span, error) {

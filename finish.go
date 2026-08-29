@@ -6,8 +6,8 @@ import (
 )
 
 type finishOptions struct {
-	Status status
-	Reason string
+	status status
+	reason string
 }
 
 func finish(ctx context.Context, opts finishOptions) {
@@ -19,11 +19,28 @@ func finish(ctx context.Context, opts finishOptions) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// TODO: catch context cancel signal (timed out or cancel call)
-	// and fail the span
+	if s.isFinished() {
+		return
+	}
+
+	handleFinish(s, opts)
+}
+
+func (s *Span) finish(opts finishOptions) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.isFinished() {
 		return
+	}
+
+	handleFinish(s, opts)
+}
+
+func handleFinish(s *Span, opts finishOptions) {
+	if s.stopCancelListener != nil {
+		s.stopCancelListener()
+		s.stopCancelListener = nil
 	}
 
 	end := time.Now()
@@ -35,8 +52,8 @@ func finish(ctx context.Context, opts finishOptions) {
 
 	s.end = end
 	s.duration = duration
-	s.status = opts.Status
-	s.reason = opts.Reason
+	s.status = opts.status
+	s.reason = opts.reason
 }
 
 func (s *Span) isFinished() bool {
