@@ -7,8 +7,6 @@ import (
 
 type status string
 
-const ctxSpanKey = "span"
-
 const (
 	statusRunning status = "running"
 	statusSuccess status = "success"
