@@ -11,6 +11,10 @@ type finishOptions struct {
 }
 
 func finish(ctx context.Context, opts finishOptions) {
+	if opts.status == statusRunning {
+		return
+	}
+
 	s, err := getCtxSpan(ctx)
 	if err != nil || s == nil {
 		// Context carries no span. Return early
@@ -27,6 +31,10 @@ func finish(ctx context.Context, opts finishOptions) {
 }
 
 func (s *Span) finish(opts finishOptions) {
+	if opts.status == statusRunning {
+		return
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
