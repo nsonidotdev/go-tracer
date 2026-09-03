@@ -9,6 +9,10 @@ import (
 )
 
 func StartSpan(parent context.Context, name string, meta map[string]string) (context.Context, error) {
+	if !isInitialized {
+		return parent, nil
+	}
+
 	parentSpan, err := getCtxSpan(parent)
 	// isNewTrace := errors.Is(err, errCtxSpanNotFound)
 
@@ -29,6 +33,7 @@ func StartSpan(parent context.Context, name string, meta map[string]string) (con
 		status: statusRunning,
 		parent: parentSpan,
 	}
+	config.tracker.recordStart(newSpan)
 
 	if parentSpan != nil {
 		parentSpan.mu.Lock()

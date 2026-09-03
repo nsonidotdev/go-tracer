@@ -11,6 +11,10 @@ type finishOptions struct {
 }
 
 func finish(ctx context.Context, opts finishOptions) {
+	if !isInitialized {
+		return
+	}
+
 	if opts.status == statusRunning {
 		return
 	}
@@ -22,6 +26,7 @@ func finish(ctx context.Context, opts finishOptions) {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	config.tracker.recordFinish(s.id)
 
 	if s.isFinished() {
 		return
@@ -31,12 +36,17 @@ func finish(ctx context.Context, opts finishOptions) {
 }
 
 func (s *Span) finish(opts finishOptions) {
+	if !isInitialized {
+		return
+	}
+
 	if opts.status == statusRunning {
 		return
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	config.tracker.recordFinish(s.id)
 
 	if s.isFinished() {
 		return

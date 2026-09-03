@@ -20,6 +20,10 @@ const (
 )
 
 func PrintTrace(ctx context.Context) {
+	if !isInitialized {
+		return
+	}
+
 	s, err := getCtxSpan(ctx)
 	if err != nil {
 		fmt.Println("error extracting span from context", err)
