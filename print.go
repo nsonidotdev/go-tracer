@@ -20,7 +20,7 @@ const (
 )
 
 func PrintTrace(ctx context.Context) {
-	if !isInitialized {
+	if !isInitialized.Load() {
 		return
 	}
 

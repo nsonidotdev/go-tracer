@@ -30,3 +30,17 @@ func (t *tracker) recordFinish(id string) {
 	defer t.mu.Unlock()
 	delete(t.activeSpans, id)
 }
+
+func (t *tracker) terminateAll(reason string) {
+	t.mu.Lock()
+	activeIDs := make([]string, 0, len(t.activeSpans))
+	for id := range t.activeSpans {
+		activeIDs = append(activeIDs, id)
+	}
+	t.mu.Unlock()
+
+	finishOptions := finishOptions{status: statusFail, reason: reason}
+	for _, ID := range activeIDs {
+		finishByID(ID, finishOptions)
+	}
+}

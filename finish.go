@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -10,8 +11,35 @@ type finishOptions struct {
 	reason string
 }
 
+func finishByID(id string, opts finishOptions) {
+	if !isInitialized.Load() {
+		return
+	}
+
+	if opts.status == statusRunning {
+		return
+	}
+
+	config.tracker.mu.Lock()
+	s := config.tracker.activeSpans[id]
+	// Unlock early because recordFinish will take a lock further
+	config.tracker.mu.Unlock()
+
+	if s == nil {
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.isFinished() {
+		return
+	}
+
+	handleFinish(s, opts)
+}
+
 func finish(ctx context.Context, opts finishOptions) {
-	if !isInitialized {
+	if !isInitialized.Load() {
 		return
 	}
 
@@ -24,10 +52,9 @@ func finish(ctx context.Context, opts finishOptions) {
 		// Context carries no span. Return early
 		return
 	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	config.tracker.recordFinish(s.id)
-
 	if s.isFinished() {
 		return
 	}
@@ -36,7 +63,7 @@ func finish(ctx context.Context, opts finishOptions) {
 }
 
 func (s *Span) finish(opts finishOptions) {
-	if !isInitialized {
+	if !isInitialized.Load() {
 		return
 	}
 
@@ -46,8 +73,6 @@ func (s *Span) finish(opts finishOptions) {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	config.tracker.recordFinish(s.id)
-
 	if s.isFinished() {
 		return
 	}
@@ -55,7 +80,14 @@ func (s *Span) finish(opts finishOptions) {
 	handleFinish(s, opts)
 }
 
+// Centralized handler for finishing a span
 func handleFinish(s *Span, opts finishOptions) {
+	if !isInitialized.Load() {
+		return
+	}
+
+	config.tracker.recordFinish(s.id)
+
 	if s.stopCancelListener != nil {
 		s.stopCancelListener()
 		s.stopCancelListener = nil
@@ -72,6 +104,8 @@ func handleFinish(s *Span, opts finishOptions) {
 	s.duration = duration
 	s.status = opts.status
 	s.reason = opts.reason
+
+	fmt.Printf("span %s finished with duration %dms | reason %s \n", s.name, s.duration.Milliseconds(), s.reason)
 }
 
 func (s *Span) isFinished() bool {

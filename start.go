@@ -9,7 +9,7 @@ import (
 )
 
 func StartSpan(parent context.Context, name string, meta map[string]string) (context.Context, error) {
-	if !isInitialized {
+	if !isInitialized.Load() || isTerminated.Load() {
 		return parent, nil
 	}
 
