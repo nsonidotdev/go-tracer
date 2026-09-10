@@ -30,6 +30,10 @@ func PrintTrace(ctx context.Context) {
 		return
 	}
 
+	printTrace(s)
+}
+
+func printTrace(s *Span) {
 	fmt.Printf("TRACE: %s\n", s.id)
 	recursivePrint(s, printOptions{isRoot: true, prefix: ""})
 }
