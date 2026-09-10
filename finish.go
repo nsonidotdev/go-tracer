@@ -103,8 +103,25 @@ func handleFinish(s *Span, opts finishOptions) {
 	s.reason = opts.reason
 
 	config.tracker.recordFinish(s.id)
+
+	rootSpan := getRoot(s)
+	if tracedFinished := isTraceFinished(rootSpan); tracedFinished {
+		handleTraceCompleted(rootSpan)
+	}
 }
 
 func (s *Span) isFinished() bool {
 	return s.status == statusFail || s.status == statusSuccess || s.status == statusSkip
+}
+
+// Checks if every span under the one passed in arguments
+// has already finished including the passed span itself
+func isTraceFinished(s *Span) bool {
+	spanFinished := s.isFinished()
+	childrenFinished := true
+	for _, childSpan := range s.children {
+		childrenFinished = isTraceFinished(childSpan)
+	}
+
+	return spanFinished && childrenFinished
 }
