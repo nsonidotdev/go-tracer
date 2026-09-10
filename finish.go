@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -86,8 +85,6 @@ func handleFinish(s *Span, opts finishOptions) {
 		return
 	}
 
-	config.tracker.recordFinish(s.id)
-
 	if s.stopCancelListener != nil {
 		s.stopCancelListener()
 		s.stopCancelListener = nil
@@ -105,7 +102,7 @@ func handleFinish(s *Span, opts finishOptions) {
 	s.status = opts.status
 	s.reason = opts.reason
 
-	fmt.Printf("span %s finished with duration %dms | reason %s \n", s.name, s.duration.Milliseconds(), s.reason)
+	config.tracker.recordFinish(s.id)
 }
 
 func (s *Span) isFinished() bool {

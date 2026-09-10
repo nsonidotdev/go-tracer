@@ -28,6 +28,13 @@ func (t *tracker) recordStart(s *Span) {
 func (t *tracker) recordFinish(id string) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
+	targetSpan := t.activeSpans[id]
+	rootSpan := getRoot(targetSpan)
+	if isTraceFinished := checkTraceFinished(rootSpan); isTraceFinished {
+		handleTraceCompleted(rootSpan)
+	}
+
 	delete(t.activeSpans, id)
 }
 

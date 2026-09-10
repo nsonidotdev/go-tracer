@@ -29,3 +29,11 @@ type Span struct {
 	// After func stop() callback
 	stopCancelListener func() bool
 }
+
+func getRoot(s *Span) *Span {
+	if s.parent == nil {
+		return s
+	}
+
+	return getRoot(s.parent)
+}
