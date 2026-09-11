@@ -7,19 +7,19 @@ import (
 	"github.com/nsonidotdev/go-tracer/internal/id"
 )
 
-func StartSpan(parent context.Context, name string, meta map[string]string) (context.Context, error) {
+func StartSpan(parent context.Context, name string, meta map[string]string) context.Context {
 	if !isInitialized.Load() || isTerminated.Load() {
-		return parent, nil
+		return parent
 	}
 
 	parentSpan, _ := getCtxSpan(parent)
 	if parentSpan != nil && parentSpan.trace.isFinished.Load() {
-		return parent, nil
+		return parent
 	}
 
 	id, err := id.GenerateRandomID(10)
 	if err != nil {
-		return parent, err
+		return parent
 	}
 
 	newSpan := &Span{
@@ -51,5 +51,5 @@ func StartSpan(parent context.Context, name string, meta map[string]string) (con
 	})
 	newSpan.stopCancelListener = stop
 
-	return ctx, nil
+	return ctx
 }
