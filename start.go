@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/nsonidotdev/go-tracer/internal/id"
@@ -13,16 +12,14 @@ func StartSpan(parent context.Context, name string, meta map[string]string) (con
 		return parent, nil
 	}
 
-	parentSpan, err := getCtxSpan(parent)
-	// isNewTrace := errors.Is(err, errCtxSpanNotFound)
-
-	if err != nil && !errors.Is(err, errCtxSpanNotFound) {
-		return nil, err
+	parentSpan, _ := getCtxSpan(parent)
+	if parentSpan != nil && parentSpan.trace.isFinished.Load() {
+		return parent, nil
 	}
 
 	id, err := id.GenerateRandomID(10)
 	if err != nil {
-		return nil, err
+		return parent, err
 	}
 
 	newSpan := &Span{
@@ -33,6 +30,13 @@ func StartSpan(parent context.Context, name string, meta map[string]string) (con
 		status: statusRunning,
 		parent: parentSpan,
 	}
+
+	if parentSpan == nil {
+		newSpan.trace = newTrace(newSpan)
+	} else {
+		newSpan.trace = parentSpan.trace
+	}
+
 	config.tracker.recordStart(newSpan)
 
 	if parentSpan != nil {

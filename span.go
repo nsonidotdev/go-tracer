@@ -17,6 +17,7 @@ const (
 type Span struct {
 	id       string
 	name     string
+	trace    *trace
 	duration time.Duration
 	start    time.Time
 	end      time.Time
