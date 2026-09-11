@@ -40,9 +40,7 @@ func StartSpan(parent context.Context, name string, meta map[string]string) cont
 	config.tracker.recordStart(newSpan)
 
 	if parentSpan != nil {
-		parentSpan.mu.Lock()
-		parentSpan.children = append(parentSpan.children, newSpan)
-		parentSpan.mu.Unlock()
+		appendSpanChild(parentSpan, newSpan)
 	}
 
 	ctx := setCtxSpan(parent, newSpan)
@@ -52,4 +50,15 @@ func StartSpan(parent context.Context, name string, meta map[string]string) cont
 	newSpan.stopCancelListener = stop
 
 	return ctx
+}
+
+func appendSpanChild(s *Span, child *Span) {
+	if s == nil || child == nil {
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.children = append(s.children, child)
 }
