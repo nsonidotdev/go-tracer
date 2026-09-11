@@ -21,3 +21,7 @@ func getCtxSpan(ctx context.Context) (*Span, error) {
 
 	return parsedSpan, nil
 }
+
+func setCtxSpan(ctx context.Context, s *Span) context.Context {
+	return context.WithValue(ctx, ctxSpanKey, s)
+}

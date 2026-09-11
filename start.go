@@ -45,7 +45,7 @@ func StartSpan(parent context.Context, name string, meta map[string]string) cont
 		parentSpan.mu.Unlock()
 	}
 
-	ctx := context.WithValue(parent, ctxSpanKey, newSpan)
+	ctx := setCtxSpan(parent, newSpan)
 	stop := context.AfterFunc(ctx, func() {
 		newSpan.finish(finishOptions{status: statusFail, reason: errSpanCtxCancelled.Error()})
 	})
