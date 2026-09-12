@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/nsonidotdev/go-tracer/internal/id"
+	"github.com/nsonidotdev/gotrail/internal/id"
 )
 
 func StartSpan(parent context.Context, name string, meta map[string]string) context.Context {
