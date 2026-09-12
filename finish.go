@@ -97,7 +97,6 @@ func handleFinish(s *Span, opts finishOptions) {
 
 	duration := end.Sub(s.start)
 
-	s.end = end
 	s.duration = duration
 	s.status = opts.status
 	s.reason = opts.reason

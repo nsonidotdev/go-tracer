@@ -20,7 +20,6 @@ type Span struct {
 	trace    *trace
 	duration time.Duration
 	start    time.Time
-	end      time.Time
 	meta     map[string]string
 	status   status
 	reason   string
