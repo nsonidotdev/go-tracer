@@ -5,21 +5,17 @@ import (
 	"sync/atomic"
 )
 
-type tracerConfig struct {
-	tracker *tracker
-}
-
 var (
 	initOnce      sync.Once
-	config        *tracerConfig
+	tracer        *tracerConfig
 	isInitialized atomic.Bool
 	isTerminated  atomic.Bool
 )
 
-func Init() {
+func Init(serviceName string) {
 	initOnce.Do(func() {
 		tracker := newTracker()
-		config = &tracerConfig{tracker: tracker}
+		tracer = &tracerConfig{tracker: tracker, service: serviceName}
 		isInitialized.Store(true)
 	})
 }
@@ -28,7 +24,7 @@ func Init() {
 func Shutdown() {
 	isTerminated.Store(true)
 
-	if config != nil && config.tracker != nil {
-		config.tracker.terminateAll(errProcTerminated.Error())
+	if tracer != nil && tracer.tracker != nil {
+		tracer.tracker.terminateAll(errProcTerminated.Error())
 	}
 }

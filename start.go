@@ -37,7 +37,7 @@ func StartSpan(parent context.Context, name string, meta map[string]string) cont
 		newSpan.trace = parentSpan.trace
 	}
 
-	config.tracker.recordStart(newSpan)
+	tracer.tracker.recordStart(newSpan)
 
 	if parentSpan != nil {
 		appendSpanChild(parentSpan, newSpan)

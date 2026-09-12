@@ -19,10 +19,10 @@ func finishByID(id string, opts finishOptions) {
 		return
 	}
 
-	config.tracker.mu.Lock()
-	s := config.tracker.activeSpans[id]
+	tracer.tracker.mu.Lock()
+	s := tracer.tracker.activeSpans[id]
 	// Unlock early because recordFinish will take a lock further
-	config.tracker.mu.Unlock()
+	tracer.tracker.mu.Unlock()
 
 	if s == nil {
 		return
@@ -102,7 +102,7 @@ func handleFinish(s *Span, opts finishOptions) {
 	s.status = opts.status
 	s.reason = opts.reason
 
-	config.tracker.recordFinish(s.id)
+	tracer.tracker.recordFinish(s.id)
 
 	rootSpan := getRoot(s)
 	if tracedFinished := isTraceFinished(rootSpan); tracedFinished {
