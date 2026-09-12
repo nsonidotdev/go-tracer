@@ -1,14 +1,27 @@
 package id
 
-import (
-	"crypto/rand"
-	"encoding/hex"
+import "crypto/rand"
+
+// OTel requirements for ids
+type (
+	TraceID [16]byte
+	SpanID  [8]byte
 )
 
-func GenerateRandomID(length int) (string, error) {
-	bytes := make([]byte, length)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
+func GenerateTraceID() (TraceID, error) {
+	var id TraceID
+	if _, err := rand.Read(id[:]); err != nil {
+		return TraceID{}, err
 	}
-	return hex.EncodeToString(bytes), nil
+
+	return id, nil
+}
+
+func GenerateSpanID() (SpanID, error) {
+	var id SpanID
+	if _, err := rand.Read(id[:]); err != nil {
+		return SpanID{}, err
+	}
+
+	return id, nil
 }

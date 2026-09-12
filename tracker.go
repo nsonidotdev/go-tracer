@@ -1,16 +1,20 @@
 package tracer
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/nsonidotdev/gotrail/internal/id"
+)
 
 type tracker struct {
 	// map of span pointers by id key
-	activeSpans map[string]*Span
+	activeSpans map[id.SpanID]*Span
 	mu          sync.Mutex
 }
 
 func newTracker() *tracker {
 	return &tracker{
-		activeSpans: make(map[string]*Span),
+		activeSpans: make(map[id.SpanID]*Span),
 	}
 }
 
@@ -25,7 +29,7 @@ func (t *tracker) recordStart(s *Span) {
 	t.activeSpans[s.id] = s
 }
 
-func (t *tracker) recordFinish(id string) {
+func (t *tracker) recordFinish(id id.SpanID) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	delete(t.activeSpans, id)
@@ -33,7 +37,7 @@ func (t *tracker) recordFinish(id string) {
 
 func (t *tracker) terminateAll(reason string) {
 	t.mu.Lock()
-	activeIDs := make([]string, 0, len(t.activeSpans))
+	activeIDs := make([]id.SpanID, 0, len(t.activeSpans))
 	for id := range t.activeSpans {
 		activeIDs = append(activeIDs, id)
 	}

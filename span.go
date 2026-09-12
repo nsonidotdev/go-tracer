@@ -3,6 +3,8 @@ package tracer
 import (
 	"sync"
 	"time"
+
+	"github.com/nsonidotdev/gotrail/internal/id"
 )
 
 type status string
@@ -15,7 +17,7 @@ const (
 )
 
 type Span struct {
-	id       string
+	id       id.SpanID
 	name     string
 	trace    *trace
 	duration time.Duration

@@ -3,6 +3,8 @@ package tracer
 import (
 	"context"
 	"time"
+
+	"github.com/nsonidotdev/gotrail/internal/id"
 )
 
 type finishOptions struct {
@@ -10,7 +12,7 @@ type finishOptions struct {
 	reason string
 }
 
-func finishByID(id string, opts finishOptions) {
+func finishByID(id id.SpanID, opts finishOptions) {
 	if !isInitialized.Load() {
 		return
 	}

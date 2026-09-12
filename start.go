@@ -17,7 +17,7 @@ func StartSpan(parent context.Context, name string, meta map[string]string) cont
 		return parent
 	}
 
-	id, err := id.GenerateRandomID(10)
+	id, err := id.GenerateSpanID()
 	if err != nil {
 		return parent
 	}
